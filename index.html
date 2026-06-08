@@ -917,14 +917,23 @@
                     ctx.fill();
 
                     scratchedPixels++;
-                    if (scratchedPixels > 40) {
-                        const calBtn = document.getElementById('save-the-date-btn');
-                        if (calBtn) {
-                            calBtn.classList.remove('opacity-0', 'pointer-events-none');
+                    
+                    // Check completion percentage every 15 scratches to save performance
+                    if (scratchedPixels % 15 === 0 && !confettiFired) {
+                        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        let transparentCount = 0;
+                        for (let i = 3; i < imgData.data.length; i += 4) {
+                            if (imgData.data[i] === 0) transparentCount++;
                         }
+                        const percentScratched = (transparentCount / (canvas.width * canvas.height)) * 100;
                         
-                        // Fire celebration confetti once
-                        if (!confettiFired) {
+                        if (percentScratched > 50) {
+                            const calBtn = document.getElementById('save-the-date-btn');
+                            if (calBtn) {
+                                calBtn.classList.remove('opacity-0', 'pointer-events-none');
+                            }
+                            
+                            // Fire celebration confetti once
                             confettiFired = true;
                             const duration = 3000;
                             const animationEnd = Date.now() + duration;
